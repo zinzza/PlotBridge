@@ -18,6 +18,11 @@ void showScreen(const char* l1, const char* l2="", const char* l3=""){
     if(l3[0]){tft->setCursor(10,80);tft->println(l3);}
 }
 
+void showRx(uint32_t n){ // ponytail: fast byte counter — text overwrite, no fill
+    tft->setTextColor(0xF7BE,0xF7BE); tft->setCursor(10,45); tft->print("                "); // erase
+    tft->setTextColor(0x0000,0xF7BE); tft->setCursor(10,45); tft->printf("Bytes: %u", n);
+}
+
 void setup() {
     pinMode(8,OUTPUT); pinMode(9,INPUT_PULLUP);
     for(int i=0;i<3;i++){digitalWrite(8,LOW);delay(200);digitalWrite(8,HIGH);delay(200);}
@@ -55,11 +60,23 @@ void loop(){
 
     static WiFiClient client;
     static uint32_t lastRx=0;
+    static char buf[64]; static int bi=0;
     if(!client||!client.connected()){
         client=server.available();
-        if(client){lastRx=millis();showScreen("Receiving...");}
+        if(client){lastRx=millis();bi=0;buf[0]=0;showScreen("Receiving...");}
     }else{
-        while(client.available()){Serial1.write(client.read());lastRx=millis();}
-        if(millis()-lastRx>3000){client.stop();showScreen("Idle");}
+        while(client.available()){
+            char c=client.read();Serial1.write(c);
+            if(bi<62)buf[bi++]=c;
+            else{memmove(buf,buf+32,32);bi=32;}
+            lastRx=millis();
+        }
+        buf[bi]=0;showScreen("Receiving...",buf);
+        if(millis()-lastRx>3000){
+            showScreen("Complete");delay(1000);
+            client.stop();
+            IPAddress ip=WiFi.localIP();
+            showScreen("Connected",("IP: "+ip.toString()).c_str(),WiFi.SSID().c_str());
+        }
     }
 }
