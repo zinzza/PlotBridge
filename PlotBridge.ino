@@ -65,19 +65,16 @@ void loop(){
 
     static WiFiClient client;
     static uint32_t lastRx=0;
-    static char buf[64]; static int bi=0;
     if(!client||!client.connected()){
         client=server.accept();
-        if(client){lastRx=millis();bi=0;buf[0]=0;showScreen("Receiving...");}
+        if(client){lastRx=millis();showScreen("Receiving...");}
     }else{
         while(client.available()){
             char c=client.read();Serial1.write(c);
-            if(bi<62)buf[bi++]=c;
-            else{memmove(buf,buf+32,32);bi=32;}
             lastRx=millis();
         }
-        buf[bi]=0;showScreen("Receiving...",buf);
         if(millis()-lastRx>3000){
+            Serial1.flush();
             showScreen("Complete");delay(1000);
             client.stop();
             IPAddress ip=WiFi.localIP();
