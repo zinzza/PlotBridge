@@ -9,9 +9,15 @@
 
 Adafruit_ST7789* tft = nullptr; // ponytail: heap-alloc → no static SPI init
 WiFiServer server(9100);
+static bool screenReady = false;
 
 void showScreen(const char* l1, const char* l2="", const char* l3=""){
-    tft->fillScreen(0xF7BE); tft->drawRect(0,0,280,240,0x0000);
+    if(!screenReady){
+        tft->fillScreen(0xF7BE); tft->drawRect(0,0,280,240,0x0000);
+        screenReady=true;
+    }else{
+        tft->fillRect(2,2,276,106,0xF7BE);
+    }
     tft->setTextColor(0x0000,0xF7BE); tft->setTextSize(2);
     tft->setCursor(10,10); tft->println(l1);
     if(l2[0]){tft->setCursor(10,45);tft->println(l2);}
@@ -38,6 +44,7 @@ void setup() {
     WiFiManager wm; wm.autoConnect("PlotBridge");
 
     tft->init(240,280);tft->setRotation(0);
+    screenReady=false;
     IPAddress ip=WiFi.localIP();
     showScreen("Connected",("IP: "+ip.toString()).c_str(),WiFi.SSID().c_str());
 
@@ -65,17 +72,20 @@ void loop(){
 
     static WiFiClient client;
     static uint32_t lastRx=0;
+    static uint32_t receivedBytes=0;
     if(!client||!client.connected()){
         client=server.accept();
-        if(client){lastRx=millis();showScreen("Receiving...");}
+        if(client){lastRx=millis();receivedBytes=0;showScreen("Receiving...");}
     }else{
         while(client.available()){
-            char c=client.read();Serial1.write(c);
+            char c=client.read();Serial1.write(c);receivedBytes++;
             lastRx=millis();
         }
         if(millis()-lastRx>3000){
+            char completeInfo[32];
+            snprintf(completeInfo,sizeof(completeInfo),"Bytes: %lu",static_cast<unsigned long>(receivedBytes));
+            showScreen("Complete",completeInfo);delay(1000);
             Serial1.flush();
-            showScreen("Complete");delay(1000);
             client.stop();
             IPAddress ip=WiFi.localIP();
             showScreen("Connected",("IP: "+ip.toString()).c_str(),WiFi.SSID().c_str());
