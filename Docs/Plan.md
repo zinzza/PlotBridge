@@ -99,7 +99,7 @@ STREAMING
   └─ 없음 → captive portal (AP: "PlotBridge")
 ```
 
-현재 버전에서는 WPS, SmartConfig, 정적 IP 설정, Serial fallback을 구현하지 않는다. 향후 연결 안정성이나 설치 편의성 요구가 생기면 별도 검토한다.
+현재 버전에서는 SmartConfig, 정적 IP 설정, Serial fallback을 구현하지 않는다. 향후 연결 안정성이나 설치 편의성 요구가 생기면 별도 검토한다.
 
 ### 3.5 HPGL 스트리밍
 
@@ -204,8 +204,6 @@ LCD는 TCP 수신 시작 시 `Receiving...`을 한 번 표시하고, 마지막 T
 ### 기능 테스트
 
 - 자동 WiFi 연결 성공/실패
-- WPS 버튼 접속 성공 (향후 연결 편의성이 필요할 때 검토)
-- WPS 30초 timeout 후 비밀번호 없는 WiFiManager 포털 대기 (향후 검토)
 - DHCP와 정적 IP (향후 검토)
 - TCP 포트 접속/거부/재접속
 - HPGL 특수 바이트 및 긴 명령
@@ -274,4 +272,4 @@ PlotBridge/
 3. 확정된 핀맵을 기준으로 Phase 1 최소 펌웨어를 만든다.
 4. UART/LCD 단독 테스트 후 실제 HPGL로 TCP 브릿지를 검증한다.
 
-WiFi 접속 방식은 현재 구현 기준으로 저장된 WiFi 자동 연결 → 연결 정보가 없으면 비밀번호 없는 WiFiManager AP와 captive portal 대기이다. WPS와 정적 IP는 향후 요구사항에 따라 검토한다.
+WiFi 접속 방식은 현재 구현 기준으로 저장된 WiFi 자동 연결 → 연결 정보가 없으면 비밀번호 없는 WiFiManager AP와 captive portal 대기이다. 정적 IP는 향후 요구사항에 따라 검토한다.
