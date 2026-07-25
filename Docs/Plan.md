@@ -23,7 +23,7 @@ HPGL 클라이언트 ── WiFi/TCP ──> ESP32-C3 ── Serial ──> 플�
 | 단계 | 상태 | 현재 결과 |
 |---|---|---|
 | Phase 0 — 요구사항/회로 | 진행 중 | HW44 미연결. LCD 연결 완료. UART GPIO와 HW44 전원/TTL 전압은 미확정 |
-| Phase 1 — 빌드/최소 하드웨어 | 진행 중 | GPIO8 직접 제어 및 LCD 초기화 전 LED 점등 수정 빌드 컴파일 및 COM4 업로드 성공. 실기기 점등 확인 필요 |
+| Phase 1 — 빌드/최소 하드웨어 | 진행 중 | GPIO8 직접 제어 및 LCD 초기화 전 LED 점등 수정 빌드 컴파일 및 COM7 업로드 성공. 실기기 점등 확인 필요 |
 | Phase 2 — NVS/BOOT 버튼 | 구현 완료, 실기기 검증 필요 | NVS WiFi SSID 저장, BOOT GPIO9 10초 초기화 코드 구현 |
 | Phase 3 — WiFi 설정 | 구현 완료, 실기기 검증 필요 | 자동 연결 → WPS 30초 → 비밀번호 없는 WiFiManager AP 흐름 구현 |
 | Phase 4 — LCD/진단 | 구현 완료, 화면 검증 필요 | 76×284 패널 가로 표시, WiFi/IP/WPS/포털 상태 화면 구현 |
@@ -32,9 +32,9 @@ HPGL 클라이언트 ── WiFi/TCP ──> ESP32-C3 ── Serial ──> 플�
 #### CLI 검증 기록
 
 - 보드: `esp32:esp32:nologo_esp32c3_super_mini:CDCOnBoot=cdc`
-- 포트: `COM4`
+- 포트: `COM7`
 - 컴파일: 성공
-- 업로드: GPIO8 직접 제어/LCD 초기화 전 LED 점등 수정 빌드 성공(COM4, 115200 baud, 플래시 Hash 검증 성공)
+- 업로드: GPIO8 직접 제어/LCD 초기화 전 LED 점등 수정 빌드 성공(COM7, 115200 baud, 플래시 Hash 검증 성공)
 - 실행 화면: LCD 실제 표시와 WiFi 접속은 다음 테스트에서 확인
 
 ## 2. 먼저 확정해야 할 결정
@@ -51,7 +51,7 @@ HPGL 클라이언트 ── WiFi/TCP ──> ESP32-C3 ── Serial ──> 플�
 | D6 | 설정 순서 | WiFiManager::autoConnect() — 저장 WiFi 자동 연결, 없으면 captive portal | 확정 |
 | D7 | 설정 모드 제한 시간 | WiFiManager autoConnect 내장 timeout, 사용자가 포털에서 설정할 때까지 유지 | 확정 |
 | D8 | 정적 IP 설정 | 포털에 DHCP로 자동 취득한 현재 IP를 표시하고, 사용자가 원할 때 정적 IP로 변경해 NVS 저장 | 확정 |
-| D9 | LCD 동작 | Adafruit_ST7789, 240×280, rotation 2, constructor로 핀 지정 | 확정 |
+| D9 | LCD 동작 | Adafruit_ST7789, 240×280, rotation 0, constructor로 핀 지정 | 확정 |
 | D10 | HPGL 작업 경계 | TCP 종료 또는 Serial 전송 완료 후 3초 동안 추가 수신이 없으면 작업 종료 | 확정 |
 
 ## 3. 권장 기본 설계
@@ -65,7 +65,7 @@ Arduino framework 기준으로 다음 모듈을 분리한다.
 - `wifi_setup`: 자동 연결, WiFiManager 포털, 설정 상태 관리
 - `tcp_server`: HPGL TCP 수신 및 클라이언트 수명 관리
 - `plotter_serial`: UART 초기화와 송신 큐/flow control
-- `display`: Adafruit_ST7789 기반 LCD 초기화, 화면 갱신, 오류 표시 (CS=2, DC=3, RST=1, MOSI=6, SCLK=4, 240×280, rotation 2)
+- `display`: Adafruit_ST7789 기반 LCD 초기화, 화면 갱신, 오류 표시 (CS=2, DC=3, RST=1, MOSI=6, SCLK=4, 240×280, rotation 0)
 - `button`: BOOT 버튼 debounce 및 10초 long-press 감지
 - `diagnostics`: Serial 로그, 오류 코드, 선택적 통계
 

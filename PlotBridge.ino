@@ -20,7 +20,7 @@ void showScreen(const char* l1, const char* l2="", const char* l3=""){
 
 void showRx(uint32_t n){ // ponytail: fast byte counter — text overwrite, no fill
     tft->setTextColor(0xF7BE,0xF7BE); tft->setCursor(10,45); tft->print("                "); // erase
-    tft->setTextColor(0x0000,0xF7BE); tft->setCursor(10,45); tft->printf("Bytes: %u", n);
+    tft->setTextColor(0x0000,0xF7BE); tft->setCursor(10,45); tft->printf("Bytes: %lu", static_cast<unsigned long>(n));
 }
 
 void setup() {
@@ -28,19 +28,16 @@ void setup() {
     for(int i=0;i<3;i++){digitalWrite(8,LOW);delay(200);digitalWrite(8,HIGH);delay(200);}
     for(int d=0;d<=255;d+=5)analogWrite(5,d),delay(15);
 
-    // Serial.begin(115200);delay(200);
-    // Serial.println("PlotBridge v1.0");
- 
-    // ponytail: SPIFFS before WiFi, tft heap-alloc after
+    // ponytail: LCD before WiFi so user sees boot screen
+    tft = new Adafruit_ST7789(2,3,6,4,1);
+    tft->init(240,280);tft->setRotation(0);
+    showScreen("PlotBridge v1.0","Connecting WiFi...");
+    SPI.end(); // ponytail: release SPI pins for WiFi AP
+
     SPIFFS.begin(true);
     WiFiManager wm; wm.autoConnect("PlotBridge");
 
-    tft = new Adafruit_ST7789(2,3,6,4,1);
     tft->init(240,280);tft->setRotation(0);
-    showScreen("PlotBridge v1.0","Booting...");
-    delay(500);
-    showScreen("WiFi Setup...","Connecting...");
-
     IPAddress ip=WiFi.localIP();
     showScreen("Connected",("IP: "+ip.toString()).c_str(),WiFi.SSID().c_str());
 
@@ -53,7 +50,15 @@ void loop(){
     static unsigned long btnPress=0;
     if(digitalRead(9)==LOW){
         if(!btnPress)btnPress=millis();
-        if(millis()-btnPress>10000){SPIFFS.format();ESP.restart();}
+        if(millis()-btnPress>10000){
+            showScreen("WiFi Reset");
+            digitalWrite(8,LOW);
+            delay(500);
+            WiFiManager wm;
+            wm.resetSettings();
+            SPIFFS.format();
+            ESP.restart();
+        }
         return;
     }
     btnPress=0;
@@ -62,7 +67,7 @@ void loop(){
     static uint32_t lastRx=0;
     static char buf[64]; static int bi=0;
     if(!client||!client.connected()){
-        client=server.available();
+        client=server.accept();
         if(client){lastRx=millis();bi=0;buf[0]=0;showScreen("Receiving...");}
     }else{
         while(client.available()){

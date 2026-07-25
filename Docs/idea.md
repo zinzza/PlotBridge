@@ -7,11 +7,11 @@ WiFi 미지원 플로터를 WiFi로. ESP32-C3 Super Mini가 받아서 Serial로 
 ```
 GND → GND
 VCC → 3.3V
-SCL → GPIO3
-SDA → GPIO0
-RST → GPIO4
-DC  → GPIO10
-CS  → GPIO6
+SCL → GPIO4
+SDA → GPIO6
+RST → GPIO1
+DC  → GPIO3
+CS  → GPIO2
 BL  → GPIO5
 ```
 
