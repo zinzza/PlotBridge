@@ -1,0 +1,587 @@
+<title>PlotBridge — Wiring Diagram</title>
+<style>
+  :root{
+    --page-bg:#eef1ee;
+    --panel-bg:#ffffff;
+    --ink:#182420;
+    --ink-soft:#57665e;
+    --line:#d7dbd4;
+    --pcb:#0b4632;
+    --pcb-deep:#083726;
+    --pcb-tint:#e3ede8;
+    --copper:#b3702f;
+    --copper-soft:#d9a35c;
+    --silk:#f2ede0;
+    --grid-dot:rgba(11,70,50,0.10);
+    --shadow:0 1px 2px rgba(20,30,25,0.06), 0 8px 24px -16px rgba(20,30,25,0.25);
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --page-bg:#121613;
+      --panel-bg:#191f1b;
+      --ink:#e6e3d8;
+      --ink-soft:#9aa89f;
+      --line:#2a332c;
+      --pcb:#0f5a40;
+      --pcb-deep:#0a3f2c;
+      --pcb-tint:#152420;
+      --copper:#e0a868;
+      --copper-soft:#c98a3e;
+      --silk:#f5f1e6;
+      --grid-dot:rgba(230,227,216,0.08);
+      --shadow:0 1px 2px rgba(0,0,0,0.3), 0 8px 24px -16px rgba(0,0,0,0.6);
+    }
+  }
+  :root[data-theme="dark"]{
+    --page-bg:#121613; --panel-bg:#191f1b; --ink:#e6e3d8; --ink-soft:#9aa89f;
+    --line:#2a332c; --pcb:#0f5a40; --pcb-deep:#0a3f2c; --pcb-tint:#152420;
+    --copper:#e0a868; --copper-soft:#c98a3e; --silk:#f5f1e6;
+    --grid-dot:rgba(230,227,216,0.08);
+    --shadow:0 1px 2px rgba(0,0,0,0.3), 0 8px 24px -16px rgba(0,0,0,0.6);
+  }
+  :root[data-theme="light"]{
+    --page-bg:#eef1ee; --panel-bg:#ffffff; --ink:#182420; --ink-soft:#57665e;
+    --line:#d7dbd4; --pcb:#0b4632; --pcb-deep:#083726; --pcb-tint:#e3ede8;
+    --copper:#b3702f; --copper-soft:#d9a35c; --silk:#f2ede0;
+    --grid-dot:rgba(11,70,50,0.10);
+    --shadow:0 1px 2px rgba(20,30,25,0.06), 0 8px 24px -16px rgba(20,30,25,0.25);
+  }
+
+  *{box-sizing:border-box;}
+  body{margin:0;}
+  .mono{font-family: ui-monospace, "SF Mono", "Cascadia Mono", "JetBrains Mono", Consolas, "Liberation Mono", monospace;}
+  .sans{font-family: Futura, "Century Gothic", "Avenir Next", "URW Gothic", "Segoe UI", sans-serif;}
+
+  .sheet{
+    background:var(--page-bg);
+    color:var(--ink);
+    font-family: Futura, "Century Gothic", "Avenir Next", "URW Gothic", "Segoe UI", sans-serif;
+    max-width:1180px;
+    margin:0 auto;
+    padding:28px 20px 56px;
+    display:flex;
+    flex-direction:column;
+    gap:28px;
+  }
+
+  /* ---- Title block ---- */
+  .titleblock{
+    background:var(--pcb);
+    color:var(--silk);
+    border-radius:10px;
+    padding:22px 28px;
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+    gap:24px;
+    flex-wrap:wrap;
+    box-shadow:var(--shadow);
+  }
+  .tb-eyebrow{
+    font-family: ui-monospace, "SF Mono", Consolas, monospace;
+    font-size:11px;
+    letter-spacing:.16em;
+    text-transform:uppercase;
+    color:var(--copper-soft);
+    margin:0 0 6px;
+  }
+  .titleblock h1{
+    font-family: ui-monospace, "SF Mono", Consolas, monospace;
+    font-size:clamp(28px,4vw,38px);
+    letter-spacing:.01em;
+    margin:0;
+    text-wrap:balance;
+  }
+  .tb-sub{
+    margin:8px 0 0;
+    font-size:14.5px;
+    color:var(--silk);
+    opacity:.82;
+  }
+  .tb-right dl{
+    display:flex;
+    gap:22px;
+    margin:0;
+  }
+  .tb-right dt{
+    font-family: ui-monospace, "SF Mono", Consolas, monospace;
+    font-size:10px;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    color:var(--copper-soft);
+    margin:0 0 3px;
+  }
+  .tb-right dd{
+    font-family: ui-monospace, "SF Mono", Consolas, monospace;
+    font-size:15px;
+    margin:0;
+    font-variant-numeric:tabular-nums;
+  }
+
+  /* ---- Drawing frame ---- */
+  .drawing-frame{
+    background:var(--panel-bg);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:6px;
+    box-shadow:var(--shadow);
+  }
+  .drawing-frame svg{ display:block; width:100%; height:auto; }
+  .scroll-x{ overflow-x:auto; }
+
+  /* ---- Section headings ---- */
+  h2{
+    font-family: ui-monospace, "SF Mono", Consolas, monospace;
+    font-size:13px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--pcb);
+    margin:0 0 14px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  h2::after{
+    content:"";
+    flex:1;
+    height:1px;
+    background:var(--line);
+  }
+  :root[data-theme="dark"] h2, @media (prefers-color-scheme:dark){ h2{ color:var(--copper-soft); } }
+
+  /* ---- Pin tables ---- */
+  .table-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+    gap:16px;
+  }
+  .card{
+    background:var(--panel-bg);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:16px 18px 18px;
+    box-shadow:var(--shadow);
+  }
+  .card h3{
+    font-family: ui-monospace, "SF Mono", Consolas, monospace;
+    font-size:12.5px;
+    letter-spacing:.04em;
+    margin:0 0 3px;
+    color:var(--ink);
+  }
+  .card h3 .desig{ color:var(--copper); margin-right:6px; }
+  .card .card-sub{
+    font-size:12px;
+    color:var(--ink-soft);
+    margin:0 0 12px;
+  }
+  table{
+    width:100%;
+    border-collapse:collapse;
+    font-family: ui-monospace, "SF Mono", Consolas, monospace;
+    font-size:12.5px;
+    font-variant-numeric:tabular-nums;
+  }
+  th{
+    text-align:left;
+    font-size:10.5px;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+    font-weight:500;
+    padding:0 8px 7px 0;
+    border-bottom:1px solid var(--line);
+  }
+  td{
+    padding:6px 8px 6px 0;
+    border-bottom:1px solid var(--line);
+    color:var(--ink);
+  }
+  tr:last-child td{ border-bottom:none; }
+  td.pin{ color:var(--pcb); }
+  :root[data-theme="dark"] td.pin, @media (prefers-color-scheme:dark){ td.pin{ color:var(--copper-soft);} }
+  td.pwr{ color:var(--copper); font-weight:600; }
+
+  /* ---- Notes ---- */
+  .notes ol{
+    margin:0;
+    padding-left:20px;
+    display:flex;
+    flex-direction:column;
+    gap:9px;
+    font-size:14px;
+    line-height:1.55;
+  }
+  .notes li::marker{
+    font-family: ui-monospace, "SF Mono", Consolas, monospace;
+    color:var(--copper);
+    font-size:12.5px;
+  }
+
+  /* ---- Advisory ---- */
+  .advisory{
+    background:var(--pcb-tint);
+    border:1px solid var(--line);
+    border-left:4px solid var(--copper);
+    border-radius:8px;
+    padding:18px 20px;
+  }
+  .advisory p{ margin:0 0 10px; font-size:14.5px; line-height:1.6; }
+  .advisory p:last-child{ margin-bottom:0; }
+  .advisory ul{ margin:8px 0; padding-left:20px; font-size:14px; line-height:1.6; }
+  .advisory strong{ color:var(--pcb); }
+  :root[data-theme="dark"] .advisory strong, @media (prefers-color-scheme:dark){ .advisory strong{ color:var(--copper-soft);} }
+
+  footer.sheet-foot{
+    text-align:center;
+    font-family: ui-monospace, "SF Mono", Consolas, monospace;
+    font-size:11px;
+    letter-spacing:.08em;
+    color:var(--ink-soft);
+    text-transform:uppercase;
+  }
+</style>
+
+<div class="sheet">
+
+  <header class="titleblock">
+    <div>
+      <p class="tb-eyebrow">Wiring Diagram · Reference</p>
+      <h1>PlotBridge</h1>
+      <p class="tb-sub">ESP32-C3 Super Mini · 1.69&Prime; ST7789 · MAX3232 (4P) — HPGL WiFi↔Serial bridge</p>
+    </div>
+    <div class="tb-right">
+      <dl>
+        <div><dt>Dwg No</dt><dd>PB-SCH-01</dd></div>
+        <div><dt>Rev</dt><dd>A</dd></div>
+        <div><dt>Date</dt><dd>2026-07-28</dd></div>
+      </dl>
+    </div>
+  </header>
+
+  <section class="drawing-frame">
+    <div class="scroll-x">
+    <svg viewBox="0 0 1190 650" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="PlotBridge wiring diagram">
+      <defs>
+        <pattern id="dotgrid" width="24" height="24" patternUnits="userSpaceOnUse">
+          <circle cx="1" cy="1" r="1" fill="var(--grid-dot)"/>
+        </pattern>
+        <marker id="padend" viewBox="0 0 8 8" refX="4" refY="4" markerWidth="6" markerHeight="6">
+          <circle cx="4" cy="4" r="3.4" fill="var(--copper)"/>
+        </marker>
+      </defs>
+
+      <rect x="0" y="0" width="1190" height="650" fill="var(--panel-bg)"/>
+      <rect x="14" y="14" width="1162" height="622" fill="url(#dotgrid)"/>
+      <rect x="14" y="14" width="1162" height="622" fill="none" stroke="var(--line)" stroke-width="1.5"/>
+      <!-- corner ticks -->
+      <g stroke="var(--pcb)" stroke-width="2.5">
+        <path d="M14,34 L14,14 L34,14" fill="none"/>
+        <path d="M1156,14 L1176,14 L1176,34" fill="none"/>
+        <path d="M1176,616 L1176,636 L1156,636" fill="none"/>
+        <path d="M34,636 L14,636 L14,616" fill="none"/>
+      </g>
+
+      <text x="34" y="34" class="mono" font-size="11" letter-spacing="1.5" fill="var(--ink-soft)">SHEET 1/1 — SIGNAL &amp; POWER WIRING (NOT TO SCALE)</text>
+
+      <!-- ===================== U1 ESP32-C3 SUPER MINI ===================== -->
+      <g>
+        <rect x="40" y="90" width="210" height="510" rx="8" fill="var(--pcb)"/>
+        <rect x="40" y="90" width="210" height="510" rx="8" fill="none" stroke="var(--pcb-deep)" stroke-width="1"/>
+        <text x="58" y="112" class="mono" font-size="10.5" letter-spacing="1.5" fill="var(--copper-soft)">U1</text>
+        <text x="145" y="132" class="mono" font-size="16" font-weight="700" fill="var(--silk)" text-anchor="middle">ESP32-C3</text>
+        <text x="145" y="150" class="mono" font-size="11" fill="var(--silk)" text-anchor="middle" opacity=".8">SUPER MINI</text>
+        <line x1="54" y1="162" x2="236" y2="162" stroke="var(--pcb-deep)" stroke-width="1"/>
+
+        <!-- pins -->
+        <!-- group -> LCD -->
+        <g class="mono" font-size="11">
+          <!-- 3V3 -->
+          <line x1="200" y1="184" x2="250" y2="184" stroke="var(--copper)" stroke-width="2.5"/>
+          <circle cx="250" cy="184" r="3.4" fill="var(--copper)"/>
+          <text x="196" y="188" fill="var(--silk)" text-anchor="end" font-weight="700">3V3</text>
+          <!-- GND -->
+          <line x1="200" y1="208" x2="250" y2="208" stroke="var(--silk)" stroke-width="2.5" opacity=".85"/>
+          <circle cx="250" cy="208" r="3.4" fill="var(--silk)"/>
+          <text x="196" y="212" fill="var(--silk)" text-anchor="end" font-weight="700">GND</text>
+          <!-- GPIO2 CS -->
+          <line x1="200" y1="234" x2="250" y2="234" stroke="var(--copper-soft)" stroke-width="1.6"/>
+          <circle cx="250" cy="234" r="3.2" fill="var(--copper)"/>
+          <text x="196" y="232" fill="var(--silk)" text-anchor="end">GPIO2</text>
+          <text x="196" y="244" fill="var(--copper-soft)" text-anchor="end" font-size="9.5">CS (LCD)</text>
+          <!-- GPIO3 DC -->
+          <line x1="200" y1="260" x2="250" y2="260" stroke="var(--copper-soft)" stroke-width="1.6"/>
+          <circle cx="250" cy="260" r="3.2" fill="var(--copper)"/>
+          <text x="196" y="258" fill="var(--silk)" text-anchor="end">GPIO3</text>
+          <text x="196" y="270" fill="var(--copper-soft)" text-anchor="end" font-size="9.5">DC (LCD)</text>
+          <!-- GPIO6 SDA -->
+          <line x1="200" y1="286" x2="250" y2="286" stroke="var(--copper-soft)" stroke-width="1.6"/>
+          <circle cx="250" cy="286" r="3.2" fill="var(--copper)"/>
+          <text x="196" y="284" fill="var(--silk)" text-anchor="end">GPIO6</text>
+          <text x="196" y="296" fill="var(--copper-soft)" text-anchor="end" font-size="9.5">SDA / MOSI</text>
+          <!-- GPIO4 SCL -->
+          <line x1="200" y1="312" x2="250" y2="312" stroke="var(--copper-soft)" stroke-width="1.6"/>
+          <circle cx="250" cy="312" r="3.2" fill="var(--copper)"/>
+          <text x="196" y="310" fill="var(--silk)" text-anchor="end">GPIO4</text>
+          <text x="196" y="322" fill="var(--copper-soft)" text-anchor="end" font-size="9.5">SCL / SCLK</text>
+          <!-- GPIO1 RST -->
+          <line x1="200" y1="338" x2="250" y2="338" stroke="var(--copper-soft)" stroke-width="1.6"/>
+          <circle cx="250" cy="338" r="3.2" fill="var(--copper)"/>
+          <text x="196" y="336" fill="var(--silk)" text-anchor="end">GPIO1</text>
+          <text x="196" y="348" fill="var(--copper-soft)" text-anchor="end" font-size="9.5">RST (LCD)</text>
+          <!-- GPIO5 BL -->
+          <line x1="200" y1="364" x2="250" y2="364" stroke="var(--copper-soft)" stroke-width="1.6"/>
+          <circle cx="250" cy="364" r="3.2" fill="var(--copper)"/>
+          <text x="196" y="362" fill="var(--silk)" text-anchor="end">GPIO5</text>
+          <text x="196" y="374" fill="var(--copper-soft)" text-anchor="end" font-size="9.5">BL (PWM)</text>
+        </g>
+
+        <line x1="54" y1="392" x2="236" y2="392" stroke="var(--pcb-deep)" stroke-width="1" stroke-dasharray="2 3"/>
+        <text x="145" y="406" class="mono" font-size="9.5" letter-spacing="1" fill="var(--copper-soft)" text-anchor="middle">↓ TO MAX3232 ↓</text>
+
+        <!-- group -> MAX3232 -->
+        <g class="mono" font-size="11">
+          <!-- 3V3 -->
+          <line x1="200" y1="428" x2="250" y2="428" stroke="var(--copper)" stroke-width="2.5"/>
+          <circle cx="250" cy="428" r="3.4" fill="var(--copper)"/>
+          <text x="196" y="432" fill="var(--silk)" text-anchor="end" font-weight="700">3V3</text>
+          <!-- GND -->
+          <line x1="200" y1="452" x2="250" y2="452" stroke="var(--silk)" stroke-width="2.5" opacity=".85"/>
+          <circle cx="250" cy="452" r="3.4" fill="var(--silk)"/>
+          <text x="196" y="456" fill="var(--silk)" text-anchor="end" font-weight="700">GND</text>
+          <!-- GPIO0 -->
+          <line x1="200" y1="478" x2="250" y2="478" stroke="var(--copper-soft)" stroke-width="1.6"/>
+          <circle cx="250" cy="478" r="3.2" fill="var(--copper)"/>
+          <text x="196" y="476" fill="var(--silk)" text-anchor="end">GPIO0</text>
+          <text x="196" y="488" fill="var(--copper-soft)" text-anchor="end" font-size="9.5">TX → MAX RX</text>
+          <!-- GPIO7 -->
+          <line x1="200" y1="504" x2="250" y2="504" stroke="var(--copper-soft)" stroke-width="1.6"/>
+          <circle cx="250" cy="504" r="3.2" fill="var(--copper)"/>
+          <text x="196" y="502" fill="var(--silk)" text-anchor="end">GPIO7</text>
+          <text x="196" y="514" fill="var(--copper-soft)" text-anchor="end" font-size="9.5">RX ← MAX TX</text>
+        </g>
+
+        <line x1="54" y1="524" x2="236" y2="524" stroke="var(--pcb-deep)" stroke-width="1"/>
+
+        <!-- onboard LED -->
+        <g transform="translate(96,552)">
+          <circle r="7" fill="none" stroke="var(--copper-soft)" stroke-width="1.6"/>
+          <circle r="3" fill="var(--copper-soft)"/>
+          <path d="M7,-7 L13,-13 M9,0 L16,0 M7,7 L13,13" stroke="var(--copper-soft)" stroke-width="1.3"/>
+        </g>
+        <text x="96" y="580" class="mono" font-size="9.5" fill="var(--silk)" text-anchor="middle">GPIO8 LED</text>
+        <text x="96" y="592" class="mono" font-size="9" fill="var(--copper-soft)" text-anchor="middle">LOW = ON</text>
+
+        <!-- onboard BOOT switch -->
+        <g transform="translate(194,552)">
+          <rect x="-10" y="-7" width="20" height="14" rx="2" fill="none" stroke="var(--copper-soft)" stroke-width="1.6"/>
+          <circle r="2.6" fill="var(--copper-soft)"/>
+        </g>
+        <text x="194" y="580" class="mono" font-size="9.5" fill="var(--silk)" text-anchor="middle">GPIO9 BOOT</text>
+        <text x="194" y="592" class="mono" font-size="9" fill="var(--copper-soft)" text-anchor="middle">10s = WiFi reset</text>
+      </g>
+
+      <!-- ===================== U2 ST7789 LCD ===================== -->
+      <g>
+        <rect x="620" y="90" width="280" height="300" rx="8" fill="var(--pcb)"/>
+        <rect x="620" y="90" width="280" height="300" rx="8" fill="none" stroke="var(--pcb-deep)" stroke-width="1"/>
+        <text x="638" y="112" class="mono" font-size="10.5" letter-spacing="1.5" fill="var(--copper-soft)">U2</text>
+        <text x="760" y="132" class="mono" font-size="16" font-weight="700" fill="var(--silk)" text-anchor="middle">ST7789 LCD</text>
+        <text x="760" y="150" class="mono" font-size="11" fill="var(--silk)" text-anchor="middle" opacity=".8">1.69&Prime; · 240×280 · SPI</text>
+        <line x1="634" y1="162" x2="886" y2="162" stroke="var(--pcb-deep)" stroke-width="1"/>
+
+        <g class="mono" font-size="11">
+          <circle cx="620" cy="184" r="3.4" fill="var(--copper)"/><text x="632" y="188" fill="var(--silk)" font-weight="700">VCC</text>
+          <circle cx="620" cy="208" r="3.4" fill="var(--silk)"/><text x="632" y="212" fill="var(--silk)" font-weight="700">GND</text>
+          <circle cx="620" cy="234" r="3.2" fill="var(--copper)"/><text x="632" y="238" fill="var(--silk)">CS</text>
+          <circle cx="620" cy="260" r="3.2" fill="var(--copper)"/><text x="632" y="264" fill="var(--silk)">DC</text>
+          <circle cx="620" cy="286" r="3.2" fill="var(--copper)"/><text x="632" y="290" fill="var(--silk)">SDA</text>
+          <circle cx="620" cy="312" r="3.2" fill="var(--copper)"/><text x="632" y="316" fill="var(--silk)">SCL</text>
+          <circle cx="620" cy="338" r="3.2" fill="var(--copper)"/><text x="632" y="342" fill="var(--silk)">RST</text>
+          <circle cx="620" cy="364" r="3.2" fill="var(--copper)"/><text x="632" y="368" fill="var(--silk)">BL <tspan fill="var(--copper-soft)" font-size="9.5">(PWM)</tspan></text>
+        </g>
+      </g>
+
+      <!-- ===================== U3 MAX3232 ===================== -->
+      <g>
+        <rect x="620" y="414" width="260" height="186" rx="8" fill="var(--pcb)"/>
+        <rect x="620" y="414" width="260" height="186" rx="8" fill="none" stroke="var(--pcb-deep)" stroke-width="1"/>
+        <text x="638" y="436" class="mono" font-size="10.5" letter-spacing="1.5" fill="var(--copper-soft)">U3</text>
+        <text x="750" y="456" class="mono" font-size="15" font-weight="700" fill="var(--silk)" text-anchor="middle">MAX3232</text>
+        <text x="750" y="473" class="mono" font-size="10.5" fill="var(--silk)" text-anchor="middle" opacity=".8">TTL ↔ RS-232, 4P module</text>
+        <line x1="634" y1="484" x2="866" y2="484" stroke="var(--pcb-deep)" stroke-width="1"/>
+
+        <!-- left (TTL side, faces MCU) -->
+        <g class="mono" font-size="11">
+          <circle cx="620" cy="428" r="3.4" fill="var(--copper)"/><text x="632" y="432" fill="var(--silk)" font-weight="700">VCC</text>
+          <circle cx="620" cy="452" r="3.4" fill="var(--silk)"/><text x="632" y="456" fill="var(--silk)" font-weight="700">GND</text>
+          <circle cx="620" cy="478" r="3.2" fill="var(--copper)"/><text x="632" y="482" fill="var(--silk)">RX</text>
+          <circle cx="620" cy="504" r="3.2" fill="var(--copper)"/><text x="632" y="508" fill="var(--silk)">TX</text>
+        </g>
+
+        <!-- right (RS-232 side, faces plotter) -->
+        <g class="mono" font-size="11">
+          <circle cx="880" cy="500" r="3.2" fill="var(--copper)"/><text x="868" y="504" fill="var(--silk)" text-anchor="end">TX</text>
+          <circle cx="880" cy="528" r="3.2" fill="var(--copper)"/><text x="868" y="532" fill="var(--silk)" text-anchor="end">RX</text>
+          <circle cx="880" cy="556" r="3.2" fill="var(--silk)"/><text x="868" y="560" fill="var(--silk)" text-anchor="end">GND</text>
+        </g>
+        <text x="750" y="586" class="mono" font-size="9" fill="var(--copper-soft)" text-anchor="middle">RS-232 side — cross-connect to plotter</text>
+      </g>
+
+      <!-- ===================== J1 PLOTTER (RS-232) ===================== -->
+      <g>
+        <rect x="1000" y="470" width="150" height="130" rx="8" fill="none" stroke="var(--pcb)" stroke-width="2" stroke-dasharray="5 4"/>
+        <text x="1016" y="492" class="mono" font-size="10.5" letter-spacing="1.5" fill="var(--pcb)">J1</text>
+        <text x="1075" y="512" class="mono" font-size="13.5" font-weight="700" fill="var(--pcb)" text-anchor="middle">PLOTTER</text>
+        <text x="1075" y="527" class="mono" font-size="10" fill="var(--ink-soft)" text-anchor="middle">RS-232 host</text>
+
+        <g class="mono" font-size="11">
+          <circle cx="1000" cy="500" r="3.2" fill="var(--copper)"/><text x="1012" y="504" fill="var(--ink)">RX <tspan fill="var(--ink-soft)" font-size="9.5">(← MAX TX)</tspan></text>
+          <circle cx="1000" cy="528" r="3.2" fill="var(--copper)"/><text x="1012" y="532" fill="var(--ink)">TX <tspan fill="var(--ink-soft)" font-size="9.5">(→ MAX RX, opt.)</tspan></text>
+          <circle cx="1000" cy="556" r="3.2" fill="var(--pcb)"/><text x="1012" y="560" fill="var(--ink)">GND</text>
+        </g>
+      </g>
+
+      <!-- wires: MCU -> LCD -->
+      <g stroke-linecap="round">
+        <line x1="250" y1="184" x2="620" y2="184" stroke="var(--copper)" stroke-width="2.5"/>
+        <line x1="250" y1="208" x2="620" y2="208" stroke="var(--pcb)" stroke-width="2.5" opacity=".55"/>
+        <line x1="250" y1="234" x2="620" y2="234" stroke="var(--pcb)" stroke-width="1.6" opacity=".7"/>
+        <line x1="250" y1="260" x2="620" y2="260" stroke="var(--pcb)" stroke-width="1.6" opacity=".7"/>
+        <line x1="250" y1="286" x2="620" y2="286" stroke="var(--pcb)" stroke-width="1.6" opacity=".7"/>
+        <line x1="250" y1="312" x2="620" y2="312" stroke="var(--pcb)" stroke-width="1.6" opacity=".7"/>
+        <line x1="250" y1="338" x2="620" y2="338" stroke="var(--pcb)" stroke-width="1.6" opacity=".7"/>
+        <line x1="250" y1="364" x2="620" y2="364" stroke="var(--pcb)" stroke-width="1.6" opacity=".7"/>
+      </g>
+
+      <!-- wires: MCU -> MAX3232 (TTL) -->
+      <g stroke-linecap="round">
+        <line x1="250" y1="428" x2="620" y2="428" stroke="var(--copper)" stroke-width="2.5"/>
+        <line x1="250" y1="452" x2="620" y2="452" stroke="var(--pcb)" stroke-width="2.5" opacity=".55"/>
+        <line x1="250" y1="478" x2="620" y2="478" stroke="var(--pcb)" stroke-width="1.6" opacity=".7"/>
+        <line x1="250" y1="504" x2="620" y2="504" stroke="var(--pcb)" stroke-width="1.6" opacity=".7"/>
+      </g>
+
+      <!-- wires: MAX3232 (RS-232) -> Plotter — dashed = leaves the board -->
+      <g stroke-linecap="round" stroke-dasharray="5 4">
+        <line x1="880" y1="500" x2="1000" y2="500" stroke="var(--pcb)" stroke-width="1.8"/>
+        <line x1="880" y1="528" x2="1000" y2="528" stroke="var(--pcb)" stroke-width="1.8" opacity=".7"/>
+        <line x1="880" y1="556" x2="1000" y2="556" stroke="var(--pcb)" stroke-width="1.8" opacity=".55"/>
+      </g>
+
+      <!-- Legend -->
+      <g transform="translate(940,150)">
+        <rect x="-16" y="-30" width="230" height="176" rx="8" fill="var(--panel-bg)" stroke="var(--line)" stroke-width="1"/>
+        <text x="0" y="-8" class="mono" font-size="10.5" letter-spacing="1.5" fill="var(--ink-soft)">LEGEND</text>
+        <line x1="0" y1="14" x2="34" y2="14" stroke="var(--copper)" stroke-width="2.5"/>
+        <text x="42" y="18" class="mono" font-size="11" fill="var(--ink)">3.3V power</text>
+        <line x1="0" y1="38" x2="34" y2="38" stroke="var(--pcb)" stroke-width="2.5" opacity=".55"/>
+        <text x="42" y="42" class="mono" font-size="11" fill="var(--ink)">GND</text>
+        <line x1="0" y1="62" x2="34" y2="62" stroke="var(--pcb)" stroke-width="1.6" opacity=".7"/>
+        <text x="42" y="66" class="mono" font-size="11" fill="var(--ink)">Digital signal (SPI/UART)</text>
+        <line x1="0" y1="86" x2="34" y2="86" stroke="var(--pcb)" stroke-width="1.8" stroke-dasharray="5 4"/>
+        <text x="42" y="90" class="mono" font-size="11" fill="var(--ink)">RS-232 (off-board cable)</text>
+        <rect x="0" y="104" width="18" height="18" rx="6" fill="none" stroke="var(--pcb)" stroke-width="2" stroke-dasharray="4 3"/>
+        <text x="42" y="117" class="mono" font-size="11" fill="var(--ink)">External device</text>
+      </g>
+
+    </svg>
+    </div>
+  </section>
+
+  <section>
+    <h2>Pin Map</h2>
+    <div class="table-grid">
+
+      <div class="card">
+        <h3><span class="desig">U1↔U2</span>ST7789 LCD</h3>
+        <p class="card-sub">Adafruit_ST7789 · 240×280 · rotation 0</p>
+        <table>
+          <thead><tr><th>LCD</th><th>Signal</th><th>ESP32-C3</th></tr></thead>
+          <tbody>
+            <tr><td class="pin">GND</td><td>접지</td><td>GND</td></tr>
+            <tr><td class="pin">VCC</td><td>전원</td><td class="pwr">3.3V</td></tr>
+            <tr><td class="pin">SCL</td><td>SPI 클록</td><td>GPIO4</td></tr>
+            <tr><td class="pin">SDA</td><td>SPI MOSI</td><td>GPIO6</td></tr>
+            <tr><td class="pin">RST</td><td>리셋</td><td>GPIO1</td></tr>
+            <tr><td class="pin">DC</td><td>Data/Command</td><td>GPIO3</td></tr>
+            <tr><td class="pin">CS</td><td>칩 선택</td><td>GPIO2</td></tr>
+            <tr><td class="pin">BL</td><td>백라이트 PWM</td><td>GPIO5</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card">
+        <h3><span class="desig">U1↔U3</span>MAX3232 (TTL측)</h3>
+        <p class="card-sub">4핀 모듈 · ESP32 쪽 3.3V TTL UART</p>
+        <table>
+          <thead><tr><th>모듈</th><th>ESP32-C3</th><th>방향</th></tr></thead>
+          <tbody>
+            <tr><td class="pin">VCC</td><td class="pwr">3.3V</td><td>전원 (3.3V 지원 확인)</td></tr>
+            <tr><td class="pin">GND</td><td>GND</td><td>공통 접지</td></tr>
+            <tr><td class="pin">RX</td><td>GPIO0</td><td>ESP32 TX → 모듈 RX</td></tr>
+            <tr><td class="pin">TX</td><td>GPIO7</td><td>모듈 TX → ESP32 RX</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card">
+        <h3><span class="desig">U3↔J1</span>RS-232 → 플로터</h3>
+        <p class="card-sub">교차 연결 (cross-connect)</p>
+        <table>
+          <thead><tr><th>MAX3232</th><th>플로터</th></tr></thead>
+          <tbody>
+            <tr><td class="pin">RS-232 TX</td><td>플로터 RX</td></tr>
+            <tr><td class="pin">RS-232 RX</td><td>플로터 TX (선택)</td></tr>
+            <tr><td class="pin">RS-232 GND</td><td>플로터 GND</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card">
+        <h3><span class="desig">U1</span>온보드 LED / 버튼</h3>
+        <p class="card-sub">ESP32-C3 Super Mini 내장</p>
+        <table>
+          <thead><tr><th>GPIO</th><th>대상</th><th>동작</th></tr></thead>
+          <tbody>
+            <tr><td class="pin">GPIO8</td><td>내장 LED</td><td>LOW = ON</td></tr>
+            <tr><td class="pin">GPIO9</td><td>BOOT 버튼</td><td>INPUT_PULLUP, 10초 = WiFi 리셋</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card">
+        <h3><span class="desig">Config</span>인터페이스 설정</h3>
+        <p class="card-sub">펌웨어 고정값</p>
+        <table>
+          <tbody>
+            <tr><td class="pin">UART</td><td colspan="2">9600-8-N-1, flow control 없음</td></tr>
+            <tr><td class="pin">TCP</td><td colspan="2">포트 9100 (raw)</td></tr>
+            <tr><td class="pin">WiFi</td><td colspan="2">WiFiManager autoConnect("PlotBridge")</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+  </section>
+
+  <section class="notes">
+    <h2>General Notes</h2>
+    <ol>
+      <li>MAX3232 모듈이 <strong>3.3V VCC</strong>를 지원하는지 확인한 뒤 전원을 연결한다. 5V 전용 모듈이면 레벨 변환이 필요하다.</li>
+      <li>MAX3232의 TTL 측 핀(VCC/GND/RX/TX)에 RS-232 신호를 직접 연결하지 않는다.</li>
+      <li>ESP32 GPIO를 플로터 RS-232 포트에 직접 연결하지 않는다 — 반드시 MAX3232를 경유한다.</li>
+      <li>RS-232 측 배선은 <strong>교차 연결</strong>이다: MAX3232 TX → 플로터 RX, MAX3232 RX ← 플로터 TX.</li>
+    </ol>
+  </section>
+
+  <section class="advisory">
+    <h2 style="margin-bottom:10px">PCB 제작 관련 안내</h2>
+    <p>위 다이어그램은 <strong>연결 관계를 보여주는 배선도(개념 회로도)</strong>입니다. devicemart 같은 PCB 제조사 발주 페이지는 보통 실제 동판 패턴이 담긴 <strong>거버(Gerber) 파일</strong>과 드릴 파일을 요구하는데, 이 다이어그램만으로는 바로 주문할 수 없습니다.</p>
+    <p>devicemart의 <span class="mono" style="font-size:.92em">custom=pcb</span> 페이지는 브라우저 자동 열람으로는 정확한 파일 형식·규격(레이어 수, 최소 크기 등) 확인이 어려웠습니다 — 주문 전 고객센터 또는 실제 주문 화면에서 요구 사항을 직접 확인해 주세요.</p>
+    <p>실제 기판을 만들려면 이 핀맵을 기준으로 <strong>KiCad</strong>나 <strong>EasyEDA</strong> 같은 PCB 설계 툴에서 부품 풋프린트를 배치하고 배선(라우팅)한 뒤 거버 파일을 내보내는 단계가 필요합니다. 원하시면 다음 단계로 KiCad 프로젝트 구성(부품 선택, 풋프린트 매칭)을 같이 진행해드릴 수 있습니다.</p>
+  </section>
+
+  <footer class="sheet-foot">PlotBridge · PB-SCH-01 · Rev A · Reference wiring diagram, not a fabrication file</footer>
+
+</div>

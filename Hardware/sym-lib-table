@@ -1,0 +1,4 @@
+(sym_lib_table
+	(version 7)
+	(lib (name "PlotBridge")(type "KiCad")(uri "${KIPRJMOD}/PlotBridge.kicad_sym")(options "")(descr "PlotBridge module symbols"))
+)

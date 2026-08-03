@@ -1,4 +1,14 @@
-# PlotBridge 핀맵 (test_lcd / test_wifi verified)
+# PlotBridge 핀맵
+
+디스플레이는 `PlotBridgeConfig.h`의 `DISPLAY_TYPE` 값으로 선택한다.
+
+```cpp
+#define DISPLAY_TYPE DISPLAY_LCD        // ST7789 LCD
+#define DISPLAY_TYPE DISPLAY_OLED       // 6핀 SPI SSD1306 OLED
+#define DISPLAY_TYPE DISPLAY_OLED_4PIN  // 4핀 I2C SSD1306 OLED
+```
+
+한 번에 하나만 활성화한다. 현재 기본값은 LCD다.
 
 ## LCD (Adafruit_ST7789, 240×280, rotation 0, font size 2)
 
@@ -12,6 +22,31 @@
 | DC | Data/Command | GPIO3 |
 | CS | 칩 선택 | GPIO2 |
 | BL | 백라이트 | GPIO5 (PWM) |
+
+## 4핀 OLED (SSD1306 I2C, 0.91인치 128×32)
+
+구매한 모듈은 상품 설명 기준 SSD1306 I2C OLED이며, 4핀은 `VCC`, `GND`, `SCL`, `SDA`이다.
+
+| OLED 핀 | 신호 | ESP32-C3 GPIO |
+|---|---|---|
+| GND | 접지 | GND |
+| VCC | 전원 | 3.3V |
+| SCL | I2C 클록 | GPIO4 |
+| SDA | I2C 데이터 | GPIO6 |
+
+펌웨어는 `Wire.begin(6, 4)`와 I2C 주소 `0x3C`를 사용한다. 모듈에 따라 주소가 `0x3D`이면 `DisplayBackend.h`의 주소를 변경해야 한다.
+
+## 6핀 OLED (SSD1306 Software SPI, 128×64)
+
+| OLED 핀 | 신호 | ESP32-C3 GPIO |
+|---|---|---|
+| GND | 접지 | GND |
+| VCC | 전원 | 3.3V |
+| CLK/SCL | SPI 클록 | GPIO4 |
+| MOSI/SDA | SPI 데이터 | GPIO6 |
+| DC | Data/Command | GPIO3 |
+| RES/RST | 리셋 | GPIO1 |
+| CS | 칩 선택 | GPIO2 |
 
 ## UART (MAX3232 RS232-TTL → Plotter)
 

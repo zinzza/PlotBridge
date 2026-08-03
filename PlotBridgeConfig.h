@@ -1,0 +1,7 @@
+#pragma once
+
+// Build one of: DISPLAY_LCD, DISPLAY_OLED, or DISPLAY_OLED_4PIN.
+#define DISPLAY_LCD 1
+#define DISPLAY_OLED 2
+#define DISPLAY_OLED_4PIN 3
+#define DISPLAY_TYPE DISPLAY_OLED_4PIN
